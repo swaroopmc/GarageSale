@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en" ng-app="sellerApp">
+
+<head>
+   
+    <style>
+        form {
+            max-width: 500px;
+            margin: 10px auto;
+            padding: 10px 20px;
+            background: #f4f7f8;
+            border-radius: 8px;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="number"],
+        input[type="tel"],
+        input[type="file"],
+        [label],
+
+        textarea,
+        select {
+          font-size: 16px;
+          border: none;
+          height: auto;
+          margin: 5px;
+          padding: 15px;
+          width: 100%;
+          background-color: #e8eeef;
+          color: #8a97a0;
+          box-shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
+          margin-bottom: 30px;
+        }
+
+        button {
+          color: #FFF;
+          background-color: red;
+          font-size: 18px;
+          text-align: center;
+          font-style: normal;
+          width: 100%;
+          border: 1px solid #3ac162;
+          border-width: 2px 2px 3px;
+          box-shadow: 0 -1px 0 rgba(255,255,255,0.1) inset;
+          margin-bottom: 10px;
+        }
+        button[type="submit"]{
+          background-color:#4bc970 ;
+        }
+        #picky{
+            margin-left:15px;
+        }
+        
+        
+    </style>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> Sell Here</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="Frontpage.css" rel="stylesheet">
+
+    
+</head>
+	<body ng-app="sellerApp" ng-controller="sellerFormController">
+       
+       <!-- <form ng-submit="processForm()"class="form-inline">  -->
+			<form enctype="multipart/form-data" action="/sellItems" method="post">
+            <fieldset>
+                <legend><strong>Item Details</strong></legend>
+                 <label for="title"><strong>Title</strong></label><br>
+                    <input type ="text" name = "title" placeholder="Post title" width="150" ng-model="formData.title"/><br>
+                    <label for="name"> <strong>Name</strong></label><br>
+                    <input type = "text" name ="name" placeholder="Seller Name" ng-model="formData.name"/><br>
+                    <label for="email"><strong> Email Id</strong></label><br>
+                    <input type = "email" name = "email" placeholder="abc@example.com" ng-model="formData.email"/><br>
+                    <label for="phone"><strong>Phone number</strong></label><br>
+                    <input type ="tel" name = "phone" placeholder="Phone number" ng-model="formData.phone"><br> 
+                    
+                    <label for="desc"><strong>Item Description</strong></label><br>
+                    <textarea name = "desc" placeholder="Description" ng-model="formData.desc"></textarea><br>
+                    <label for="price"><strong>Price</strong></label><br>
+                    <input type="number" name = "price" placeholder="Price in $" ng-model="formData.price"><br>
+                    <label for="location"><strong>City</strong></label><br>
+                    <input type="text" name = "location" placeholder="City/Locality name" ng-model="formData.location"><br>
+                    
+                     <select>
+                     <optgroup label="Category">
+                     <option label="Automobiles">Automobiles</option><br>
+                     <option label="Electronics">Electronics</option><br>
+                     <option label="Kitchen">Kitchen</option><br>
+                     <option label="Fashion">Fashion</option><br>
+                     <option label="Others">Others</option><br>
+                     </select>
+
+                    
+                    <input type ="radio" name = "pick" id="pickn" ng-model="formData.pick">
+                    <label for="pick">Can deliver</label>
+                    <input type ="radio" name = "pick" id="picky" ng-model="formData.pick">
+                    <label for="picky">Pick Up only</label>
+
+                    <input type="file" name="pic" id="file" accept="image/*"><br><br>   
+                    <button type="submit" class="btn"><strong>Post the Ad!</strong> </button>
+                    <button class="btn"><strong>Reset</strong> </button>
+
+            </fieldset>
+
+        </form>     
+        <pre>
+        {{ formData }}
+        </pre>
+
+
+	    <!-- Footer -->
+        <footer>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>Copyright © Your Website 2014</p>
+                </div>
+            </div>
+        </footer>
+
+    <!-- /.container -->
+
+    
+   
+
+
+
+</body>
+ <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    
+     <!-- Angular.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
+     <script>
+        // define angular module/app
+        var sellerApp = angular.module('sellerApp', []).controller('sellerFormController', ['$scope', '$http' ,
+                                                                                            
+        // create angular controller and pass in $scope and $http
+        function sellerFormController(scope, http) {
+            scope.formData = {};
+			var form = new FormData();
+			var file = angular.element($('input[type="file"]')[0].files[0]);
+
+			form.append('model', angular.toJson(scope.formData));
+			form.append('file', file);
+			//form.append("data',scope.formData);
+            scope.processForm = function() {
+				
+			//http.defaults.headers.post = { 'Content-Type' : 'value' };
+            http({
+                  method  : 'POST',
+                  url     : '/upload',
+				  // pass in data as strings
+				
+				  headers: {
+        			'Content-Type': undefined
+    				},
+				    /**
+				    transformRequest: function (data) {
+										var file = angular.element($('input[type="file"]')[0].files[0]);
+											scope.files = []; 
+											scope.files.push(file);
+											console.log($('input[type="file"]')[0].files[0]);
+			
+											form.append('model', angular.toJson(data.model));
+											form.append('file', file);
+											return form;
+													  },
+					**/
+					transformRequest: angular.identity,
+				    data: form
+				
+
+			
+
+
+               //   contentType: false,
+              //    headers : { 'Content-Type': 'multipart/form-data' }  // set the headers so angular passing info as form data (not request payload)
+                 })
+                  .success(function(data) {
+                    console.log("Posted seller"+data);
+
+                    if (!data.success) {
+                      // if not successful, bind errors to error variables
+                     // $scope.errorName = data.errors.name;
+                    } else {
+                      // if successful, bind success message to message
+                      //$scope.message = data.message;
+                    }
+              });
+            }
+
+        }]);
+    </script>
+
+   
+</html>
+
+
