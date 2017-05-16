@@ -1,5 +1,5 @@
 var mongoose    =   require("mongoose");
-mongoose.connect('mongodb://user1:sharable@ds139761.mlab.com:39761/ajdemodb');
+mongoose.connect('<your mongodb url>');
 var mongoSchema =   mongoose.Schema;
 
 var userSchema  = {
