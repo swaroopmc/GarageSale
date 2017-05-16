@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Box office success predictor, predicts the success of the movies before release, Analytics page">
+        <meta name="author" content="cmpe280">
+        <title><%= title %></title>
+        <link rel="stylesheet" type="text/css" href="bootstrap3/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="bootstrap3/css/bootstrap-theme.min.css">
+        
+        <link rel="stylesheet" type="text/css" href="stylesheets/dasheachitem.css">
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+        <script>
+            angular.module('itemApp', [])
+                .controller('itemController', function($scope,$http) {
+//                    var layout = {
+//                        height: 780,
+//                        width: 1180
+//                    
+//                    };    
+                    console.log("Hi page loading");
+           
+                    function getItemDetail(){
+                        
+					    var idx = document.URL.indexOf('?')+1;
+						var id = document.URL.substring(idx);
+						console.log(idx+"parmj got this"+id);
+                        $http({
+                            method: 'get',
+                            url: '/items?q='+id
+                        }).success(function(response){
+                            //if(response!= undefined){
+                                //console.log(response.doc);
+                                $scope.item = response[0];
+                                if($scope.item.pick.indexOf('pickn'))
+                                    $scope.item.pickVal = "correct.png";
+                                else
+                                   $scope.item.pickVal = "wrong.png";
+                                console.log("par"+$scope.item.pickVal);
+                                console.log("This is response");
+                                
+                                console.log(response);
+                            console.log("This is item");
+                                console.log($scope.item);
+                            
+                            
+                            $scope.getImgUrl = function(url){
+						return url.toString().substring(8);
+					}
+                                
+//                           }else{
+//                                $scope.item.price = "item is not present in database";
+//                                document.getElementById("itemseeData").innerHTML = "No data found";
+//                            }
+                        }).error(function(error){
+                          console.log(error);
+                        });
+                    };
+                    getItemDetail(); 
+                
+                   
+            });
+        </script>
+        
+        
+        
+        <script>
+        
+        </script>
+
+    </head>
+    
+   
+    
+    
+    
+<body>
+    
+        
+    
+    <div class="container dash"  ng-app="itemApp" ng-controller="itemController">
+    			<div>
+    			<div>
+    			<br>
+    			<br>
+
+				<p>
+				<a href="/">
+				<img border="0"  alt="home" src="homeImg.PNG" width="100" height="50">
+				</a>
+				</p>
+				</div>	
+				<section>
+					<div class="alertColor text-center asterisk">
+						<label><h1>{{item.heading}}</h1></label>
+					</div>
+					<table class="table">
+						<tbody>
+							<tr >
+								<td class="col-md-3">
+									<div class="image">
+										<img height="540" width="350" alt="{{item.desc}}" title="{{item.desc}}" ng-src="./{{getImgUrl(item.itemImageURL)}}">
+									</div>
+								</td>
+								<td class="col-md-9">
+									<br/>
+                                    <br/>
+									
+									<div class="row paraStyle">
+										<p><strong>Description : </strong>
+											<span class="summaryStyle">{{item.desc}}</span>
+										</p>
+									</div>
+                                    
+                                    
+                                    <div class="row paraStyle">
+										<p><strong>Category : </strong>
+											<span class="summaryStyle">{{item.category}}</span>
+										</p>
+									</div>
+                                    
+                                    
+                                    <div class="row paraStyle">
+										<p><strong>Location : </strong>
+											<span class="summaryStyle">{{item.location}}</span>
+										</p>
+									</div>
+																
+									<div class="row paraStyle">
+										<p><strong>Price : </strong>
+											<span class="summaryStyle">{{item.price}}$</span>
+										</p>
+									</div>
+                                    <br/>
+                                    <br/>
+                                  
+                                  <div class="row paraStyle">
+										<p><strong>Seller Name: </strong>
+											<span class="summaryStyle">{{item.name}}</span>
+										</p>
+									</div>
+									
+									<div class="row paraStyle">
+										<p><strong> Email Id: </strong>
+											<span class="summaryStyle">{{item.email}}</span>
+										</p>
+									</div>
+                                    
+									<div class="row paraStyle">
+										<p><strong>Phone : </strong>
+										     <span></span>
+											<span class="summaryStyle">{{item.phone}}</span>
+
+										</p>
+									</div>
+									
+                              <div class="row paraStyle">
+										<p><strong>Delivery option : </strong>
+                                            <img width="25" height="20" src={{item.pickVal}}>
+										</p>
+                                    </div>
+                                    
+								</td>
+                                
+							</tr>
+						</tbody>
+					</table>
+				</section>
+				</div>
+			</div>
+    
+    
+    </body>
+    
+    
+</html>
+

@@ -1,0 +1,257 @@
+f<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="Display the Items">
+		<title><%= title %></title>
+		<!--[if lt IE 9]
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+        <![end if]-->
+		<link rel="stylesheet" type="text/css" href="bootstrap3/css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="bootstrap3/css/bootstrap-theme.min.css">
+		<link rel="stylesheet" type="text/css" href="stylesheets/sticky_footer.css">
+		<link rel="stylesheet" type="text/css" href="stylesheets/dash.css">
+
+	</head>
+	<body>
+		<div ng-app="userApp" ng-controller="userController">
+			<nav class="navbar navbar-inverse navbar-fixed-top">
+				<div class="container">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<label class="brand_label" style="margin-top:10px;">GarageSale</label>
+					</div>
+				</div>
+			</nav>
+			<div class="container options">
+					<div class="col-sm-offset-1">
+						<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#findItem"><span class="glyphicon glyphicon-search"></span>Search</button>
+						<button class="btn btn-primary btn-lg" ng-click="postItem()"><span class="glyphicon glyphicon-delete"></span>Post new Item</button>
+					</div>	
+			</div>
+			<!-- Modal -->
+			<div id="imgModal" class="modal fade" role="dialog">
+			  	<div class="modal-dialog">
+			    	<!-- Modal content-->
+			    	<div class="modal-content">
+				      	<div class="modal-header">
+				        	<button type="button" class="close" data-dismiss="modal">&times;</button>
+				        	<h1 class="modal-title alertColor text-center">See Full Image</h1>
+				      	</div>
+				      	<div class="modal-body">
+				      		 <img id="imgMod" width="560" height="315" ng-src="images(item.itemImageURL)" frameborder="0"></img>
+				      	</div>
+			    	</div>
+			  	</div>
+			</div>
+			<div id="findItem" class="modal fade" role="dialog">
+			  	<div class="modal-dialog">
+			    	<!-- Modal content-->
+			    	<div class="modal-content">
+				      	<div class="modal-header">
+				        	<button type="button" class="close" data-dismiss="modal">&times;</button>
+				        	<h1 class="modal-title alertColor text-center">Search</h1>
+				      	</div>
+				      	<div class="modal-body">
+				      		<form name="findItemForm"> 
+								<div class="row">
+									<div class="form-group">
+										<div class="col-md-10">
+											<input class="form-control" type="text" placeholder="Enter Search term" id="itemFind" ng-model="item_name" name="item_name" required>
+										</div>
+									</div>
+								</div>
+							</form>
+				      	</div>
+				      	<div class="modal-footer">
+				        	<button type="button" ng-click="searchFun()" class="btn btn-primary" ng-disabled="findItemForm.$invalid">
+				        		<span class="glyphicon"></span>Submit</button>
+							<button type="button" class="btn btn-danger" ng-click="clearFind()">
+								<span class="glyphicon glyphicon-remove"></span>Clear</button>
+				      	</div>
+			    	</div>
+			  	</div>
+			</div>
+			<div>
+			<div class="col-sm-2">
+				<nav>
+		            <ul class="list-group">
+		              <input class="list-group-item" type="text" name="Search heading" placeholder="Filter by Heading" ng-model="globalSearch.heading"><br>
+		              <input class="list-group-item" type="text" name="Search price" placeholder="Filter by Price" ng-model="globalSearch.price"><br>
+		              <input class="list-group-item" type="text" name="Search category" placeholder="Filter by Category" ng-model="globalSearch.category"><br>
+		              <input class="list-group-item" type="text" name="Search description" placeholder="Filter by Detail" ng-model="globalSearch.desc"><br>
+		            </ul>
+        		</nav>
+
+        			<div class="dropdown">
+					  <button class="btn btn-primary dropdown-toggle"  type="button" data-toggle="dropdown" >Select Category
+					  <span class="caret" ></span></button>
+					  <ul class="dropdown-menu">
+					    <li><a href="" ng-click="myFun('household');">household</a></li>
+					    <li><a href="" ng-click="myFun('automobile');">automobile</a></li>
+					    <li><a href="" ng-click="myFun('donated');">electronics</a></li>
+					  </ul>
+					</div>
+			</div> 
+			<div class="col-sm-10" class="container dash">
+				<section>
+					<div class="alertColor text-center asterisk">
+						<label>{{norecord}}</label>
+					</div>
+					<table class="table">
+						<tbody>
+							<tr ng-repeat="item in items | filter: globalSearch"">
+								<td class="col-md-3">
+									<div class="image">
+										<img height="320" width="210" alt="{{item.message.desc}}" title="{{item.desc}}" ng-src="./{{getImgUrl(item.itemImageURL)}}">
+									</div>
+								</td>
+								<td class="col-md-9">
+									<div class="row nameStyle">
+										<label>
+											<h1>{{item.heading}}</h1>
+										</label>
+										<a href="#imgModal" class="btn btn-lg btn-info pull-right btn-style" data-toggle="modal" ng-disabled="item.itemImageURL.length === 0" ng-click="images(item.itemImageURL)"><span class="glyphicon glyphicon-film" ></span>&nbsp;View Image</a>
+										<button class="btn btn-warning btn-lg pull-right btn-style" ng-click="getItemDetails(item._id)"><span class="glyphicon glyphicon-eye-open"></span>&nbsp; More Details</button>
+									</div>
+									
+									<div class="row paraStyle">
+										<p><strong>Description : </strong>
+											<span class="summaryStyle">{{item.desc}}</span>
+										</p>
+									</div>
+																
+									<div class="row paraStyle">
+										<p><strong>Price : </strong>
+											<span class="summaryStyle">{{item.price}}$</span>
+										</p>
+									</div>
+									<div class="row paraStyle">
+										<p><strong> Location: </strong>
+											<span class="summaryStyle">{{item.location}}</span>
+										</p>
+									</div>
+									<div class="row paraStyle">
+										<p><strong>Phone : </strong>
+										     <span></span>
+											<span class="summaryStyle">{{item.phone}}</span>
+
+										</p>
+									</div>
+									<div class="row paraStyle">
+										<p><strong>Category : </strong>
+										     <span></span>
+											<span class="summaryStyle">{{item.category}}</span>
+
+										</p>
+									</div>
+								</td>
+								
+							</tr>
+						</tbody>
+					</table>
+				</section>
+			</div>
+			</div>
+			<footer class="footer">
+				<div class="container">
+					<div class="bottom-footer">
+						<ul class="footer-nav">
+							<li>garageSale© 2017</li>
+						</ul>
+					</div>
+				</div>
+			</footer>
+		</div>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+		<script type="text/javascript" src="bootstrap3/js/bootstrap.min.js"></script>
+		<script type="text/javascript">
+			angular.module('userApp', [])
+	  			.controller('userController', function($scope, $http,  $sce) {
+	  				var url = "";
+	  				function loadPage(){
+	  					$http({
+	                		method: 'get',
+	                		url: '/items'
+	                	}).success(function(response){
+	                		if(response.returnstatus == "error"){
+	                			$scope.errorMsg = response.errors;
+	                		}
+	                		else if(response.returnstatus == "nodata")
+	                		{
+	                			$scope.errorMsg = "No items found in the database";
+	                		}
+	                		else{
+							    console.log("Get items parmj"+JSON.stringify(response));
+	                			$scope.items = response;
+	                		}
+	                	}).error(function(error){
+	                		console.log(error);
+	                	});
+		  			}
+					loadPage();
+
+		  			
+		  			$scope.images = function(imgLink){
+		  				$scope.imgSrc = imgLink.toString().substring(8);
+		  				console.log($scope.imgSrc);
+		  			} 
+			  		$("#imgModal").on('hide.bs.modal', function(){
+						$("#imgMod").attr('src', '');
+					});
+					$("#imgModal").on('show.bs.modal', function(){
+					    $("#imgMod").attr('src', $scope.imgSrc);
+					});
+
+					$("#findItem").on('show.bs.modal', function(){
+					    $('#itemFind').focus()
+					});
+
+					$scope.clearFind = function(){
+						$scope.item_name = "";
+					}
+					$scope.getImgUrl = function(url){
+						return url.toString().substring(8);
+					}
+
+
+					$scope.getItemDetails = function(id){	
+		  				window.location = 'itemDetail?'+id;		
+					}
+
+					
+					$scope.postItem = function(){
+					 	window.location ='/seller.html';
+					}
+
+					$scope.searchFun = function(){
+		                    console.log("hi search Fun");
+		                	console.log("Provided searchItem in UI is " + $scope.item_name +".......");
+							console.log($scope.item_name+".......");
+		                 	$http.get('/items/search/'+ $scope.item_name).success(function(response){       
+		                    $scope.items = response.message;
+		                    console.log(response.message);
+		             		});
+		             };
+
+
+		             $scope.myFun = function(cat){
+		                 console.log("Provided category is " + cat);
+		                 $http.get('/items/category/'+cat).success(function(response){       
+		                     $scope.items = response.message;
+		                     console.log(response.message);
+		             });
+		             };
+
+		  		});
+		</script>
+	</body>
+</html>

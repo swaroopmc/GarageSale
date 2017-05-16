@@ -4,19 +4,7 @@ var crypto = require('crypto');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
-
 var bodyParser = require('body-parser');
-var util = require('util');
-var fs       = require('fs');
-var path = require('path');
-//var multipart = require('connect-multiparty');
-//var multipartMiddleware = multipart();
-var multer  = require('multer')
-var upload = multer({ dest: './uploads/' })
-var busboy = require('connect-busboy');
- var fileupload = require('fileupload').createFileUpload('/uploads').middleware
-
-
 
 
 
@@ -24,34 +12,20 @@ var app = express();
 var mongoOp =require("./model/mongo");
 
 
-//app.use(fileUpload());
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'views')));
-app.use(express.static(path.join(__dirname, 'uploads')));
 
 
-app.set('view engine', 'ejs');
-
-//GET user dashboard page
-app.get('/', function(req, res, next) {
-	res.render('dashboard', { title: ' Dashboard' });
-});
 
 
-/*app.get("/", function(req,res){
+app.get("/", function(req,res){
         var response = {};
-        res.sendFile(path.join(__dirname + '/views/itemsDashboard.ejs'));
-    });*/
-
-//GET item --swaroop
-app.get('/itemDetail', function(req, res, next) {
-    res.render('itemDetail', { title: ' Item' });
-});
+        res.sendFile(path.join(__dirname + '/views/Frontpage.html'));
+    });
 
 
 app.get("/items/category/:cat", function(req,res){
@@ -63,9 +37,9 @@ app.get("/items/category/:cat", function(req,res){
         mongoOp.find({'category': category },function(err,data){
         
             if(err) {
-                response = {"message" : "Error fetching data"};
+                response = {"error" : true,"message" : "Error fetching data"};
             } else {
-                response = {"message" : data};
+                response = {"error" : false,"message" : data};
             }
             res.json(response);
         });
@@ -78,7 +52,7 @@ app.get("/items/search/:searchItem", function(req,res){
         var response = {};     
 
         var searchItem = req.params.searchItem;
-        console.log('search item provided in nodejs is'  + searchItem);
+        console.log('searctem provided in nodejs' + searchItem);
         var exp = new RegExp(searchItem);
         console.log(exp);
         mongoOp.find({ 'heading': { $regex:exp} } ,function(err,data){
@@ -94,59 +68,32 @@ app.get("/items/search/:searchItem", function(req,res){
     
     });
 
+app.get("/items/category/:searchItem", function(req,res){
 
+        var response = {};     
 
-app.post("/sellItems/",upload.single('pic'),function(req, res,next){
-    console.log('file info: ',req.files);
-    console.log("post");
-    var db = new mongoOp();
-    
-    for(var key in req.body){
-            console.log(key+" value is"+req.body[key]);
-            db[key] = req.body[key];
-    }
-    console.log("Categor"+req.body['category']);
-            var currentDate = new Date();
-            var date = (currentDate.getMonth()+1) +'/'+currentDate.getDate()+'/'+currentDate.getFullYear();
-            db["date"] = date;
-    
-    
-    console.log("Id is"+db._id);
-    /**
-    db.title = req.body['title'];
-    db.name =req.body['name'];
-    db.email =req.body['email'];
-    db.phone =req.body['phone'];
-    db.desc =req.body['desc'];
-    db.price =req.body['price'];
-    db.location =req.body['location'];
-    db.pick =req.body['pick'];
-    **/
-    if(req.file)
-        db.itemImageURL = req.file.path;
-    console.log(JSON.stringify(db));    
-    var response = {};
+        var category = req.params.cat;
+        console.log('category provided is nodejs' + category);
+        mongoOp.find({'category': category },function(err,data){
         
-    db.save(function(err){
-        
-    if(err) {
-          response = {"error" : true,"message" : "Error adding data"};
-    } else {
-                response = {"error" : false,"message" : "Data added"};
-        }
-         //   res.json(response);
-           // res.redirect('sellItems/'+db._id);
-              res.redirect('/');
-   });
+            if(err) {
+                response = {"error" : true,"message" : "Error fetching data"};
+            } else {
+                response = {"error" : false,"message" : data};
+            }
+            res.json(response);
+        });
 
-});
+    
+    });
 
 
-app.get("/sellItems/:itemId", function(req,res){
+
+
+app.get("/items/:itemId", function(req,res){
         var response = {};
         //var _id = req.params.id;
-	    console.log("For email"+req.params.emailId);
-        Item.findOne({'_id':req.params.itemId},function(err,data){
+        mongoOp.findOne({'itemId':req.params.itemId},function(err,data){
         // Mongo command to fetch all data from collection.
             if(err) {
                 response = {"error" : true,"message" : "Error fetching data"};
@@ -161,7 +108,7 @@ app.get("/sellItems/:itemId", function(req,res){
 
 
 
-//Swaroop
+
 app.get("/items", function(req,res){
 
         var response = {};
@@ -169,12 +116,12 @@ app.get("/items", function(req,res){
 
         if(!req.param('q')) {
 
-       mongoOp.find({},function(err,data){
+        mongoOp.find({},function(err,data){
     
             if(err) {
-                response = {"message" : "Error fetching data"};
+                response = {"error" : true,"message" : "Error fetching data"};
             } else {
-                response = data;
+                response = {"error" : false,"message" : data};
             }
             res.json(response);
         });
@@ -187,12 +134,12 @@ app.get("/items", function(req,res){
 else{
         var u = req.param('q');
        console.log(u);
-        mongoOp.find({'_id': u },function(err,data){
+        mongoOp.find({'itemName': u },function(err,data){
         
             if(err) {
                 response = {"error" : true,"message" : "Error fetching data"};
             } else {
-                response = data;
+                response = {"error" : false,"message" : data};
             }
             res.json(response);
         });
@@ -210,8 +157,8 @@ else{
 
 
 app.post("/items/postforsale",function(req,res){
-	    console.log("post");
-        var db = new Item();
+        console.log("Ajeet Testing");
+        var db = new mongoOp();
         var response = {};
         //var user = req.param('user');
         db.itemId = req.body.itemId;
@@ -236,10 +183,9 @@ app.post("/items/postforsale",function(req,res){
 
 
 
-
 app.delete("/items/:itemId", function(req,res){
   var response ={}
-  Item.findOneAndRemove({'itemId':req.params.itemId}, function (err, data) {  
+  mongoOp.findOneAndRemove({'itemId':req.params.itemId}, function (err, data) {  
   
 response = {
         message: "successfully deleted",
@@ -256,7 +202,7 @@ response = {
  
 app.put("/items/:itemId", function(req,res){
 
-Item.findOne({'itemId':req.params.itemId}, function (err, data) {  
+mongoOp.findOne({'itemId':req.params.itemId}, function (err, data) {  
     // Handle any possible database errors
     if (err) {
         res.status(500).send(err);
@@ -281,7 +227,9 @@ Item.findOne({'itemId':req.params.itemId}, function (err, data) {
 }); //put
 
 
-app.listen(3001);
+app.listen(3010, function () {
+console.log("express has started on port 3010");
+});
 console.log("the server is runnning");
 
 
